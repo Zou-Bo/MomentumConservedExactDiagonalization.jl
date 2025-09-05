@@ -1,5 +1,5 @@
 ---
-name: momentum-conserved-ed
+name: mced
 description: Julia package for momentum-conserved exact diagonalization of quantum many-body systems with advanced analysis capabilities
 status: backlog
 created: 2025-09-05T02:41:10Z
