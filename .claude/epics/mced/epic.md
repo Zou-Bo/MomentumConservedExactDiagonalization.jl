@@ -2,7 +2,7 @@
 name: momentum-conserved-ed
 status: backlog
 created: 2025-09-05T02:41:10Z
-updated: 2025-09-05T21:09:13Z
+updated: 2025-09-05T22:47:08Z
 progress: 0%
 prd: .claude/prds/mced.md
 github: https://github.com/Zou-Bo/MomentumConservedExactDiagonalization.jl/issues/12
@@ -79,7 +79,8 @@ Transform existing research code into a production-ready Julia package for momen
 - Prepare infrastructure for organizing existing EDPara functionality
 
 ### Phase 2: Core Engine Organization (Weeks 4-6)
-- Migrate existing EDPara parameter container with validation
+- Migrate existing EDPara parameter container with validation (Task 2)
+- Improve EDPara with internal constructor, remove error field, add V_int validation (Task 2a)
 - Organize MBS64 type family and bit-based state representation
 - Structure existing scattering-based Hamiltonian construction
 - Integrate KrylovKit diagonalization routines
@@ -101,7 +102,8 @@ Transform existing research code into a production-ready Julia package for momen
 ## Task Breakdown Preview
 
 - [ ] **001.md - Package Foundation**: Initialize Julia package structure and CI/CD (2h, parallel: false)
-- [ ] **002.md - Core EDPara Struct**: Migrate and organize existing parameter container with validation (4h, parallel: true)
+- [ ] **002.md - Core EDPara Struct**: Migrate existing parameter container with all 9 fields intact (4h, parallel: true)
+- [ ] **002a.md - Improved EDPara Struct**: Remove error field, implement internal constructor, add V_int validation (2h, parallel: true)
 - [ ] **003.md - Hilbert Space Construction**: Organize existing momentum-resolved basis utilities (6h, parallel: true)
 - [ ] **004.md - Hamiltonian Builder**: Structure existing scattering-based Hamiltonian construction (8h, parallel: true)
 - [ ] **005.md - Diagonalization Engine**: Integrate existing KrylovKit eigensolvers with momentum conservation (8h, parallel: true)
@@ -114,6 +116,7 @@ Transform existing research code into a production-ready Julia package for momen
 ## Tasks Created
 - [ ] 001.md - Package Foundation (parallel: false)
 - [ ] 002.md - Core EDPara Struct (parallel: true)
+- [ ] 002a.md - Improved EDPara Struct (parallel: true)
 - [ ] 003.md - Hilbert Space Construction (parallel: true)
 - [ ] 004.md - Hamiltonian Builder (parallel: true)
 - [ ] 005.md - Diagonalization Engine (parallel: true)
@@ -123,10 +126,10 @@ Transform existing research code into a production-ready Julia package for momen
 - [ ] 009.md - Landau Level Example (parallel: true)
 - [ ] 010.md - Documentation & Release (parallel: true)
 
-Total tasks: 10
-Parallel tasks: 9
+Total tasks: 11
+Parallel tasks: 10
 Sequential tasks: 1
-Estimated total effort: 72 hours (9 days)
+Estimated total effort: 74 hours (9.25 days)
 
 ## Dependencies
 
