@@ -1,6 +1,7 @@
 # MomentumConservedExactDiagonalization.jl
 
 A Julia package for momentum-conserved exact diagonalization of quantum many-body systems, targeting researchers in condensed matter physics.
+(In Development)
 
 ## Features
 

@@ -2,9 +2,10 @@
 name: momentum-conserved-ed
 status: backlog
 created: 2025-09-05T02:41:10Z
+updated: 2025-09-05T21:09:13Z
 progress: 0%
-prd: .claude/prds/momentum-conserved-ed.md
-github: [Will be updated when synced to GitHub]
+prd: .claude/prds/mced.md
+github: https://github.com/Zou-Bo/MomentumConservedExactDiagonalization.jl/issues/12
 ---
 
 # Epic: MomentumConservedExactDiagonalization Julia Package
@@ -12,36 +13,43 @@ github: [Will be updated when synced to GitHub]
 ## Overview
 Transform existing research code into a production-ready Julia package for momentum-conserved exact diagonalization of quantum many-body systems. The package will provide both core ED capabilities and advanced analysis tools while maintaining momentum conservation symmetries.
 
+### Central Focus
+- **Momentum Basis**: Specialized for momentum-space representation of Hilbert space, applicable beyond tight-binding models including Landau levels and moiré systems
+- **Flexible Components**: Supports additional components beyond momentum, including both number-conserved and non-conserved components (with hopping terms)
+- **Hilbert Space Basis**: Many-Body states are represented with an integer, each bit representing a single-particle basis state
+- **Existing Functionality**: All core functions already implemented - focus is on migration, structural organization, and documentation without changing core functionality
+
 ## Architecture Decisions
 
 ### Core Architecture
-- **Modular Design**: Split into core ED engine, analysis modules, and example systems
-- **Type System**: Leverage Julia's multiple dispatch for extensible Hamiltonian types
-- **Memory Efficiency**: Use sparse matrices and block diagonalization by momentum sectors
-- **Performance**: Thread-based parallelism for independent momentum sectors
-- **API Design**: Follow Julia conventions with intuitive struct-based interfaces
+- **ED Method Focus**: No real space representations, focus on momentum basis
+- **Type System**: Simple MBS <: Integer family for many-body states, no complex structs to save memory usage
+- **No Iteration**: ED method has no iteration - direct diagonalization approach
+- **Basis Representation**: Hilbert space basis labeled by momentum index and conserved components, mapped to bit positions
+- **Hamiltonian Structure**: Scattering lists instead of traditional matrix assembly
+- **EDPara-Centric Design**: All parameters, mappings, and scattering amplitudes stored in EDPara container
+- **Twisted Boundary Conditions**: Rigid momentum shift support with float (k1, k2) parameters for magnetic flux threading
 
 ### Technology Stack
-- **Core**: Julia 1.6+ with LinearAlgebra, SparseArrays, Arpack
+- **Core**: Julia 1.6+ with LinearAlgebra, SparseArrays, KrylovKit
 - **Testing**: Test.jl with extensive benchmarks
 - **Documentation**: Documenter.jl with physics-focused tutorials
 - **CI/CD**: GitHub Actions for cross-platform testing
 - **Optional**: Plots.jl for visualization, BenchmarkTools.jl for performance
 
 ### Design Patterns
-- **Builder Pattern**: EDPara struct with fluent interface for parameter construction
-- **Strategy Pattern**: Pluggable algorithms for different diagonalization methods
-- **Template Method**: Common interface for different physical systems
-- **Observer Pattern**: Progress tracking for long calculations
+- **EDPara Container**: Single source of truth for all parameters and mappings
+- **Scattering Representation**: Hamiltonian terms as lists of scattering processes
+- **Integer State Representation**: MBS <: Integer family eliminates need for BasisState/MomentumBasis structs
+- **Direct Diagonalization**: No iteration - ED method solves eigenvalue problems directly
 
 ## Technical Approach
 
 ### Core Components
-- **EDPara**: Parameter container with validation and serialization
-- **HilbertSpace**: Momentum-resolved basis construction with symmetry exploitation
-- **HamiltonianBuilder**: Sparse matrix assembly with block structure
-- **Diagonalizer**: Unified interface for different eigensolvers (dense, sparse, iterative)
-- **SymmetryAnalyzer**: Automatic symmetry detection and exploitation
+- **EDPara**: Central parameter container storing momentum indices, conserved components, bit mappings, one-body arrays, scattering amplitude functions, and rigid momentum shift (k1, k2) as Float64 for twisted boundary conditions
+- **MBS64 Type Family**: Existing MBS64 <: Integer implementation representing many-body states (up to 64 orbitals) with bit-based occupation
+- **Scattering Framework**: Existing scattering-based Hamiltonian construction with 1-body and 2-body terms converted to Scattering structs, with momentum inputs as floats (k_list + momentum_shift)
+- **Basis Organization**: Momentum-space Hilbert space construction applicable to Landau levels, moiré systems, and beyond tight-binding models, with support for momentum mesh shifts via rigid translation
 
 ### Analysis Modules
 - **EntanglementEntropy**: Efficient bipartite entanglement calculations
@@ -65,20 +73,22 @@ Transform existing research code into a production-ready Julia package for momen
 ## Implementation Strategy
 
 ### Phase 1: Foundation (Weeks 1-3)
-- Initialize Julia package structure
+- Initialize Julia package structure for existing code migration
 - Set up GitHub repository with CI/CD
-- Create basic project skeleton and documentation framework
-- Implement core EDPara struct with validation
+- Create project skeleton and documentation framework
+- Prepare infrastructure for organizing existing EDPara functionality
 
-### Phase 2: Core Engine (Weeks 4-6)
-- Build Hilbert space construction utilities
-- Develop Hamiltonian matrix assembly
-- Add diagonalization routines with multiple solver options
-- Create comprehensive tests and benchmarks
+### Phase 2: Core Engine Organization (Weeks 4-6)
+- Migrate existing EDPara parameter container with validation
+- Organize MBS64 type family and bit-based state representation
+- Structure existing scattering-based Hamiltonian construction
+- Integrate KrylovKit diagonalization routines
+- Create comprehensive tests preserving existing functionality
 
 ### Phase 3: Analysis Features (Weeks 7-9)
 - Implement entanglement entropy calculations
-- Add twisted boundary conditions with spectrum flow
+- Add twisted boundary conditions with spectrum flow using rigid momentum shift (k1, k2) in EDPara
+- Update interaction functions to accept float momenta (k_list + momentum_shift) instead of integer indices
 - Develop many-body Chern number calculations
 - Create correlation function utilities
 
@@ -91,10 +101,10 @@ Transform existing research code into a production-ready Julia package for momen
 ## Task Breakdown Preview
 
 - [ ] **001.md - Package Foundation**: Initialize Julia package structure and CI/CD (2h, parallel: false)
-- [ ] **002.md - Core EDPara Struct**: Design parameter container with validation (4h, parallel: true)
-- [ ] **003.md - Hilbert Space Construction**: Build momentum-resolved basis utilities (6h, parallel: true)
-- [ ] **004.md - Hamiltonian Builder**: Implement sparse matrix assembly with block structure (8h, parallel: true)
-- [ ] **005.md - Diagonalization Engine**: Add efficient eigensolvers with momentum conservation (8h, parallel: true)
+- [ ] **002.md - Core EDPara Struct**: Migrate and organize existing parameter container with validation (4h, parallel: true)
+- [ ] **003.md - Hilbert Space Construction**: Organize existing momentum-resolved basis utilities (6h, parallel: true)
+- [ ] **004.md - Hamiltonian Builder**: Structure existing scattering-based Hamiltonian construction (8h, parallel: true)
+- [ ] **005.md - Diagonalization Engine**: Integrate existing KrylovKit eigensolvers with momentum conservation (8h, parallel: true)
 - [ ] **006.md - Entanglement Entropy**: Implement bipartite entanglement calculations (6h, parallel: true)
 - [ ] **007.md - Twisted Boundary Conditions**: Implement magnetic flux threading and spectrum flow (8h, parallel: true)
 - [ ] **008.md - Topological Invariants**: Add many-body Chern numbers via Berry curvature (8h, parallel: true)

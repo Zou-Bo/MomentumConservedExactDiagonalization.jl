@@ -11,6 +11,12 @@ created: 2025-09-05T02:41:10Z
 
 This Julia package provides a comprehensive framework for exact diagonalization of quantum many-body systems with momentum conservation, targeting researchers in condensed matter physics. The package transforms existing research code into a production-ready Julia package with advanced features including entanglement entropy calculations, twisted boundary conditions, many-body Chern numbers, and spectrum flow analysis.
 
+### Central Focus
+- **Momentum Basis**: Specialized for momentum-space representation of Hilbert space, applicable beyond tight-binding models including Landau levels and moiré systems
+- **Flexible Components**: Supports additional components beyond momentum, including both number-conserved and non-conserved components (with hopping terms)
+- **Hilbert Space Basis**: Many-Body states are represented with an integer, each bit representing an single-particle basis state.
+- **Existing Functionality**: All core functions already implemented - focus is on migration, structural organization, and documentation without changing core functionality
+
 ## Problem Statement
 
 Current exact diagonalization implementations for momentum-conserved quantum systems are fragmented, difficult to reproduce, and lack standardized interfaces. Researchers typically maintain custom scripts that are hard to share, validate, or extend. There's a critical need for a unified, well-tested Julia package that provides both core ED capabilities and advanced analysis tools while maintaining momentum conservation symmetries.
@@ -61,13 +67,15 @@ Current exact diagonalization implementations for momentum-conserved quantum sys
 
 ### Functional Requirements
 
-#### Core ED Engine
-- **EDPara struct**: Container for Hamiltonian parameters
-- **Hilbert space construction**: Support for 2D momentum labels with/without hopping
-- **Hamiltonian construction**: Efficient building of sparse Hamiltonian matrices
-- **Diagonalization**: Leverage Julia's ARPACK/IterativeSolvers for large systems
-- **Momentum conservation**: Automatic block diagonalization by momentum sectors
-- **Symmetry exploitation**: Implement translational and rotational symmetries
+#### Core ED Engine (Migration & Structural Organization)
+- **Momentum Basis**: Organize existing momentum-space Hilbert space construction, applicable to Landau levels, moiré systems, and beyond tight-binding models
+- **EDPara struct**: Centralize existing parameter container with momentum indices, conserved components, bit mappings, one-body arrays, and scattering amplitude functions
+- **Component Flexibility**: Structure support for additional conserved quantities including number-conserved and non-conserved components (with hopping terms)
+- **MBS64 Type Family**: Organize existing MBS64 <: Integer implementation for many-body states without changing core functionality
+- **Scattering Framework**: Structure existing scattering-based Hamiltonian construction with 1-body and 2-body terms
+- **Basis Organization**: Organize existing bit-position mapping for momentum and conserved quantum numbers
+- **Diagonalization**: Structure existing KrylovKit-based eigensolver without functional changes
+- **Threading**: Organize existing threaded Hamiltonian construction while preserving performance
 
 #### Advanced Analysis Features
 - **Entanglement entropy**: Calculation for arbitrary bipartitions
@@ -137,6 +145,7 @@ Current exact diagonalization implementations for momentum-conserved quantum sys
 - **Dependencies**: Minimal external dependencies beyond LinearAlgebra and SparseArrays
 - **Platform**: Cross-platform support (Linux, macOS, Windows)
 - **Precision**: Double precision floating point arithmetic
+- **Code Structure**: Must follow existing codebase patterns - MBS <: Integer type family, EDPara-centric design, scattering-based Hamiltonian
 
 ### Resource Constraints
 - **Development time**: 3-month initial development cycle
@@ -171,7 +180,7 @@ Current exact diagonalization implementations for momentum-conserved quantum sys
 ## Dependencies
 
 ### External Dependencies
-- **Julia packages**: LinearAlgebra, SparseArrays, Arpack, IterativeSolvers
+- **Julia packages**: LinearAlgebra, SparseArrays, KrylovKit
 - **Optional packages**: Plots.jl for visualization, Documenter.jl for docs
 - **Testing**: Test.jl, Aqua.jl for quality assurance
 - **CI/CD**: GitHub Actions, Codecov for coverage reporting
@@ -196,12 +205,12 @@ Current exact diagonalization implementations for momentum-conserved quantum sys
 - Create basic project skeleton
 - Write initial documentation framework
 
-### Phase 2: Core ED Engine (Week 3-6)
-- Implement EDPara struct and parameter handling
-- Build Hilbert space construction utilities
-- Develop Hamiltonian matrix construction
-- Add diagonalization routines
-- Create basic tests and benchmarks
+### Phase 2: Core ED Engine Organization (Week 3-6)
+- Organize existing EDPara struct with momentum indices and bit mappings
+- Structure existing MBS64 <: Integer type family for state representation  
+- Organize existing scattering-based Hamiltonian construction
+- Structure existing KrylovKit diagonalization routines
+- Create comprehensive tests preserving existing functionality
 
 ### Phase 3: Advanced Features (Week 7-10)
 - Implement entanglement entropy calculations

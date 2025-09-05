@@ -1,6 +1,6 @@
 name = "MomentumConservedExactDiagonalization"
-uuid = "12345678-1234-1234-1234-123456789abc"
-authors = ["Alice loves Bob"]
+uuid = "98cbdc2b-972c-4f19-894e-eb9dedc2f188"
+authors = ["Alice loves Bob <zou.bo.phys@gmail.com>"]
 version = "0.1.0"
 
 [deps]
@@ -14,7 +14,7 @@ SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
 Combinatorics = "1.0.3"
 ExtendableSparse = "1.7.1"
 KrylovKit = "0.10.0"
-julia = "1.6"
+julia = "1.11"
 
 [extras]
 BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
