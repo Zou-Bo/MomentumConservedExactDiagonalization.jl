@@ -2,7 +2,7 @@
 name: mced
 status: backlog
 created: 2025-09-05T02:41:10Z
-updated: 2025-09-06T02:35:38Z
+updated: 2025-09-06T03:49:02Z
 progress: 0%
 prd: .claude/prds/mced.md
 github: https://github.com/Zou-Bo/MomentumConservedExactDiagonalization.jl/issues/24

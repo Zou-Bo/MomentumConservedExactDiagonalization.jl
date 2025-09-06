@@ -3,7 +3,11 @@
     "allow": [
       "Bash(sed:*)",
       "Bash(find:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(for:*)",
+      "Bash(do echo:*)",
+      "Bash(gh issue close:*)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
