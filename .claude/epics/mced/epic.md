@@ -2,10 +2,10 @@
 name: mced
 status: backlog
 created: 2025-09-05T02:41:10Z
-updated: 2025-09-05T22:47:08Z
+updated: 2025-09-06T02:35:38Z
 progress: 0%
 prd: .claude/prds/mced.md
-github: https://github.com/Zou-Bo/MomentumConservedExactDiagonalization.jl/issues/12
+github: https://github.com/Zou-Bo/MomentumConservedExactDiagonalization.jl/issues/24
 ---
 
 # Epic: MomentumConservedExactDiagonalization Julia Package
@@ -42,6 +42,11 @@ Transform existing research code into a production-ready Julia package for momen
 - **Scattering Representation**: Hamiltonian terms as lists of scattering processes
 - **Integer State Representation**: MBS <: Integer family eliminates need for BasisState/MomentumBasis structs
 - **Direct Diagonalization**: No iteration - ED method solves eigenvalue problems directly
+
+### Testing Principles
+- **Task Isolation**: Tests for each task should be simple and self-contained, not involving functionality from other tasks
+- **Unit Testing Focus**: Each component tested independently before integration
+- **No Cross-Task Dependencies**: Test validation should not require completion of other tasks
 
 ## Technical Approach
 

@@ -1,10 +1,3 @@
-"""
-MBS64 - Many-Body State 64-bit representation
-
-This module provides the MBS64 type and associated functions for representing
-many-body states using 64-bit unsigned integers where each bit represents
-orbital occupation.
-"""
 
 """
     MBS64{bits} <: Integer
@@ -24,7 +17,7 @@ Creates a new MBS64 with the given bit state, validating that the state
 fits within the specified number of bits.
 """
 struct MBS64{bits} <: Integer
-    state::UInt64
+    n::UInt64
     
     function MBS64{bits}(state::UInt64) where {bits}
         @assert bits isa Integer && 0 < bits <= 64 "The number of bits must be an integer between 1 and 64."
@@ -44,8 +37,8 @@ end
 Display the MBS64 state in a human-readable format showing the bit pattern.
 """
 function Base.show(io::IO, mbs::MBS64{bits}) where bits
-    print(io, "MBS64: ", mbs.state, " = ", view(reverse(bitstring(mbs.state)), 1:bits), " ($bits bits)")
-    if !isempty(findall(==('1'), view(reverse(bitstring(mbs.state)), bits+1:64)))
+    print(io, "MBS64: ", mbs.n, " = ", view(reverse(bitstring(mbs.n)), 1:bits), " ($bits bits)")
+    if !isempty(findall(==('1'), view(reverse(bitstring(mbs.n)), bits+1:64)))
         println(io, " (Unphysical bits are occupied in MBS64.)")
         @warn "Unphysical bits are occupied in MBS64."
     end
@@ -61,7 +54,7 @@ Concatenate two MBS64 states by shifting the first state and ORing with the seco
 Used for combining states from different components.
 """
 function *(mbs1::MBS64{b1}, mbs2::MBS64{b2}) where {b1, b2}
-    MBS64{b1+b2}(mbs1.state << b2 | mbs2.state)
+    MBS64{b1+b2}(mbs1.n << b2 | mbs2.n)
 end
 
 """
@@ -69,7 +62,7 @@ end
 
 Comparison operators for sorting MBS64 states.
 """
-<(mbs1::MBS64{b}, mbs2::MBS64{b}) where {b} = mbs1.state < mbs2.state
+<(mbs1::MBS64{b}, mbs2::MBS64{b}) where {b} = mbs1.n < mbs2.n
 
 
 """
@@ -78,7 +71,7 @@ Comparison operators for sorting MBS64 states.
 Check equality of two MBS64 states. Different bit sizes are never equal.
 """
 function ==(mbs1::MBS64{b}, mbs2::MBS64{b}) where {b}
-    mbs1.state == mbs2.state
+    mbs1.n == mbs2.n
 end
 
 # Occupation and state manipulation
@@ -89,7 +82,7 @@ end
 Return the list of occupied orbital indices (1-based) in the many-body state.
 """
 function occ_list(mbs::MBS64{bits}) where {bits}
-    return findall(==('1'), view(reverse(bitstring(mbs.state)), 1:bits))
+    return findall(==('1'), view(reverse(bitstring(mbs.n)), 1:bits))
 end
 
 """
@@ -114,7 +107,7 @@ Returns true if all specified orbitals are occupied.
 """
 function isoccupied(mbs::MBS64{bits}, i_list::Int64...) where {bits}
     mask = MBS64(bits, i_list...)
-    return mbs.state & mask.state == mask.state
+    return mbs.n & mask.n == mask.n
 end
 
 """
@@ -125,7 +118,7 @@ Returns true if all specified orbitals are empty.
 """
 function Base.isempty(mbs::MBS64{bits}, i_list::Int64...) where {bits}
     mask = MBS64(bits, i_list...)
-    return mbs.state & mask.state == 0
+    return mbs.n & mask.n == 0
 end
 
 """
@@ -137,9 +130,9 @@ If check=true, verifies that the orbitals were originally empty.
 function occupy!(mbs::MBS64{bits}, i_list::Int64...; check::Bool=true) where {bits}
     mask = MBS64(bits, i_list...)
     if check
-        @assert mbs.state & mask.state == 0 "Some orbitals are already occupied."
+        @assert mbs.n & mask.n == 0 "Some orbitals are already occupied."
     end
-    return MBS64{bits}(mbs.state | mask.state)
+    return MBS64{bits}(mbs.n | mask.n)
 end
 
 """
@@ -151,9 +144,9 @@ If check=true, verifies that the orbitals were originally occupied.
 function Base.empty!(mbs::MBS64{bits}, i_list::Int64...; check::Bool=true) where {bits}
     mask = MBS64(bits, i_list...)
     if check
-        @assert mbs.state & mask.state == mask.state "Some orbitals are already empty."
+        @assert mbs.n & mask.n == mask.n "Some orbitals are already empty."
     end
-    return MBS64{bits}(mbs.state & ~mask.state)
+    return MBS64{bits}(mbs.n & ~mask.n)
 end
 
 # These functions may be useless
@@ -177,7 +170,7 @@ end
 Count the total number of occupied orbitals (particles) in the state.
 """
 function count_particles(mbs::MBS64{bits}) where {bits}
-    count_ones(mbs.state)
+    count_ones(mbs.n)
 end
 
 const get_particle_number = count_particles
@@ -219,7 +212,7 @@ end
 Get the raw UInt64 representation of the state.
 """
 function get_state_index(mbs::MBS64{bits}) where {bits}
-    return mbs.state
+    return mbs.n
 end
 
 """
@@ -248,7 +241,7 @@ function occ_num_between(mbs::MBS64{bits}, i_start::Int64, i_end::Int64) where {
     for i in i_start+1:i_end-1
         mask |= UInt64(1) << (i - 1)
     end
-    return count_ones(mbs.state & mask)
+    return count_ones(mbs.n & mask)
 end
 
 
@@ -290,13 +283,3 @@ function MBS64_totalmomentum(para::EDPara, i_list::Int64...)
     iszero(Gk[2]) || (k2 = mod(k2, Gk[2]))
     return k1, k2
 end
-
-
-# Export all public functions
-export MBS64
-export occ_list, isoccupied, isempty, occupy!, empty!, flip_orbital
-export count_particles, get_particle_number, occ_num_between, get_occupied_orbitals
-export get_empty_state, get_full_state
-export MBS64_totalmomentum
-export create_particle, annihilate_particle, c_dagger, c
-export get_state_index, set_state

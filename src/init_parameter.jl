@@ -1,3 +1,5 @@
+import Base: @assert
+
 """
     EDPara - Parameters for momentum-conserved exact diagonalization
     
@@ -5,8 +7,6 @@
     calculations, including momentum conservation rules, component structure, and interaction
     potentials.
 """
-
-export EDPara
 
 """
     mutable struct EDPara
@@ -40,59 +40,38 @@ mutable struct EDPara
     # k_list[:, i] = (k_x, k_y)
     k_list::Matrix{Int64}
 
-    Nk::Int64
-    Nc_hopping::Int64
-    Nc_conserve::Int64
+    Nk::Int64 # number of momentum states
+    Nc_hopping::Int64 # number of components with hopping (not conserved)
+    Nc_conserve::Int64  # number of components with conserved quantum numbers
     Nc::Int64
 
     # (to be fill later by user)
-    H_onebody::Array{ComplexF64,4}
+    H_onebody::Array{ComplexF64,4} 
     V_int::Function
 
     """
-        EDPara(;Gk::Tuple{Int64, Int64}=(0, 0), 
-               k_list::Matrix{Int64},
-               Nc_hopping::Int64=1,
-               Nc_conserve::Int64=1,
-               H_onebody::Union{Nothing,Array{ComplexF64,4}}=nothing,
-               V_int::Function)
-    
-    Internal constructor for EDPara with validation and default values.
+    Constructor for EDPara with keyword arguments and validation.
     """
-    function EDPara(;Gk::Tuple{Int64, Int64}=(0, 0), 
+    function EDPara(; Gk::Tuple{Int64, Int64}=(0, 0), 
                      k_list::Matrix{Int64},
                      Nc_hopping::Int64=1,
                      Nc_conserve::Int64=1,
-                     H_onebody::Union{Nothing,Array{ComplexF64,4}}=nothing,
+                     H_onebody::Array{ComplexF64,4}=zeros(ComplexF64, Nc_hopping, Nc_hopping, Nc_conserve, size(k_list, 2)),
                      V_int::Function)
+
         # Calculate derived fields
         Nk = size(k_list, 2)
-        Nc = Nc_hopping * Nc_conserve
+        Nc = Nc_conserve * Nc_hopping
         
         # Validation
         @assert Nc > 0 "Number of components must be positive"
         @assert Nk*Nc <= 64 "The Hilbert space dimension must not exceed 64 bits."
         
         # Validate V_int function signature
-        try
-            # Test with dummy arguments to verify function signature
-            test_result = V_int(1, 1, 1, 1, 1, 1, 1, 1)
-            if !(test_result isa ComplexF64)
-                throw(AssertionError("V_int must return ComplexF64, got $(typeof(test_result))"))
-            end
-        catch e
-            if isa(e, AssertionError)
-                rethrow(e)
-            else
-                throw(AssertionError("V_int function must have signature (kf1, kf2, ki1, ki2, cf1, cf2, ci1, ci2) -> ComplexF64. Got error: $e"))
-            end
+        if !hasmethod(V_int, Tuple{Int,Int,Int,Int,Int,Int,Int,Int})
+            throw(AssertionError("V_int function must accept 8 arguments: (kf1, kf2, ki1, ki2, cf1, cf2, ci1, ci2)"))
         end
-        
-        # Set default H_onebody if not provided
-        if H_onebody === nothing
-            H_onebody = zeros(ComplexF64, Nc_hopping, Nc_hopping, Nc_conserve, Nk)
-        end
-        
+
         new(Gk, k_list, Nk, Nc_hopping, Nc_conserve, Nc, H_onebody, V_int)
     end
 end
