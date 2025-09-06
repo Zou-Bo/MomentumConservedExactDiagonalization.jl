@@ -40,7 +40,8 @@ using SparseArrays
     @testset "EDPara Structure" begin
         # Test basic EDPara construction
         k_list = [1 2 3; 4 5 6]  # 3 momentum points (2x3 matrix)
-        para = EDPara(k_list=k_list, Gk=(6, 9), Nc_hopping=1, Nc_conserve=1)
+        V_int_test(kf1, kf2, ki1, ki2, cf1, cf2, ci1, ci2) = 1.0 + 0.0im
+        para = EDPara(k_list=k_list, Gk=(6, 9), Nc_hopping=1, Nc_conserve=1, V_int=V_int_test)
         
         @test para.Nk == 3
         @test para.Nc_hopping == 1
@@ -50,13 +51,14 @@ using SparseArrays
         @test size(para.H_onebody) == (1, 1, 1, 3)
         
         # Test error conditions
-        @test_throws AssertionError EDPara(k_list=k_list, Gk=(6, 9), Nc_hopping=0, Nc_conserve=1)
+        @test_throws AssertionError EDPara(k_list=k_list, Gk=(6, 9), Nc_hopping=0, Nc_conserve=1, V_int=V_int_test)
     end
     
     @testset "Momentum Calculations" begin
         # Create a simple test case
         k_list = [1 2; 3 4]  # 2 momentum points: (1,3) and (2,4) (2x2 matrix)
-        para = EDPara(k_list=k_list, Gk=(0, 0), Nc_hopping=1, Nc_conserve=1)
+        V_int_test(kf1, kf2, ki1, ki2, cf1, cf2, ci1, ci2) = 1.0 + 0.0im
+        para = EDPara(k_list=k_list, Gk=(0, 0), Nc_hopping=1, Nc_conserve=1, V_int=V_int_test)
         
         # Test single state momentum
         k1, k2 = MBS64_totalmomentum(para, 1, 2)
@@ -64,7 +66,8 @@ using SparseArrays
         @test k2 == 3 + 4  # sum of k_y components
         
         # Test with Gk constraints
-        para_gk = EDPara(k_list=k_list, Gk=(3, 7), Nc_hopping=1, Nc_conserve=1)
+        V_int_test2(kf1, kf2, ki1, ki2, cf1, cf2, ci1, ci2) = 1.0 + 0.0im
+        para_gk = EDPara(k_list=k_list, Gk=(3, 7), Nc_hopping=1, Nc_conserve=1, V_int=V_int_test2)
         k1_gk, k2_gk = MBS64_totalmomentum(para_gk, 1, 2)
         @test k1_gk == mod(1 + 2, 3)
         @test k2_gk == mod(3 + 4, 7)
@@ -73,7 +76,8 @@ using SparseArrays
     @testset "MBS List Generation" begin
         # Test single component MBS list
         k_list = [1 2 3; 4 5 6]  # 3 momentum points (2x3 matrix)
-        para = EDPara(k_list=k_list, Gk=(0, 0), Nc_hopping=1, Nc_conserve=1)
+        V_int_test(kf1, kf2, ki1, ki2, cf1, cf2, ci1, ci2) = 1.0 + 0.0im
+        para = EDPara(k_list=k_list, Gk=(0, 0), Nc_hopping=1, Nc_conserve=1, V_int=V_int_test)
         
         # Test with 1 electron
         mbs_list = ED_mbslist_onecomponent(para, 1)
@@ -86,7 +90,8 @@ using SparseArrays
         @test all(mbs -> count_ones(mbs.n) == 2, mbs_list2)
         
         # Test full MBS list with multiple components
-        para_multi = EDPara(k_list=k_list, Gk=(0, 0), Nc_hopping=1, Nc_conserve=2)
+        V_int_test2(kf1, kf2, ki1, ki2, cf1, cf2, ci1, ci2) = 1.0 + 0.0im
+        para_multi = EDPara(k_list=k_list, Gk=(0, 0), Nc_hopping=1, Nc_conserve=2, V_int=V_int_test2)
         mbs_list_multi = ED_mbslist(para_multi, (1, 1))  # 1 electron in each conserved component
         @test length(mbs_list_multi) == 9  # 3 * 3 = 9 combinations
     end
@@ -94,7 +99,8 @@ using SparseArrays
     @testset "Momentum Block Division" begin
         # Create test case with known momentum blocks
         k_list = [0 1; 0 0]  # 2 momentum points: (0,0) and (1,0) (2x2 matrix)
-        para = EDPara(k_list=k_list, Gk=(2, 1), Nc_hopping=1, Nc_conserve=1)
+        V_int_test(kf1, kf2, ki1, ki2, cf1, cf2, ci1, ci2) = 1.0 + 0.0im
+        para = EDPara(k_list=k_list, Gk=(2, 1), Nc_hopping=1, Nc_conserve=1, V_int=V_int_test)
         
         # Generate MBS list with 1 electron
         mbs_list = ED_mbslist_onecomponent(para, 1)
@@ -143,7 +149,8 @@ using SparseArrays
     @testset "One-body Scattering List" begin
         # Create test EDPara with one-body terms
         k_list = [1 2; 3 4]  # 2 momentum points (2x2 matrix)
-        para = EDPara(k_list=k_list, Gk=(0, 0), Nc_hopping=1, Nc_conserve=1)
+        V_int_test(kf1, kf2, ki1, ki2, cf1, cf2, ci1, ci2) = 1.0 + 0.0im
+        para = EDPara(k_list=k_list, Gk=(0, 0), Nc_hopping=1, Nc_conserve=1, V_int=V_int_test)
         
         # Add some one-body terms
         para.H_onebody[1, 1, 1, 1] = 1.0 + 0.0im  # Diagonal term
@@ -165,7 +172,8 @@ using SparseArrays
     @testset "Integration Test - Small System" begin
         # Create a very small test system
         k_list = [0 0]  # 2 momentum points at origin (2x1 matrix gives 2 points)
-        para = EDPara(k_list=k_list, Gk=(0, 0), Nc_hopping=1, Nc_conserve=1)
+        V_int_test(kf1, kf2, ki1, ki2, cf1, cf2, ci1, ci2) = 1.0 + 0.0im
+        para = EDPara(k_list=k_list, Gk=(0, 0), Nc_hopping=1, Nc_conserve=1, V_int=V_int_test)
         
         # Create MBS list with 1 electron in 2 orbitals
         mbs_list = ED_mbslist_onecomponent(para, 1)
